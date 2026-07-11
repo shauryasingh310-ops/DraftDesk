@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: 'DraftDesk - AI-Powered Support Management',
   description: 'Manage support tickets with AI-powered draft generation and knowledge base integration',
   generator: 'v0.app',
+  icons: {
+    icon: '/android-chrome-512x512.png',
+    apple: '/android-chrome-512x512.png',
+  },
 }
 
 export const viewport: Viewport = {

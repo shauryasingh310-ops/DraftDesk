@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+/*
+  SupportCopilot design system — restrained, confident, portfolio-grade.
+  Spacing/type/radius follow the 4px grid + Tailwind default scale.
+  This file owns: color tokens, fonts, motion, focus, reduced-motion.
+*/
+
+@theme {
+  /* Fonts */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Color — 3 neutrals + 1 accent (indigo). Status colors carry meaning. */
+  --color-background: #fafafa;
+  --color-foreground: #18181b;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #18181b;
+
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+
+  --color-primary: #4f46e5; /* accent — primary action, focus, active nav */
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #f4f4f5;
+  --color-secondary-foreground: #18181b;
+
+  --color-accent: #f4f4f5;
+  --color-accent-foreground: #18181b;
+
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #e4e4e7;
+  --color-input: #e4e4e7;
+  --color-ring: #4f46e5;
+
+  /* Status / priority (meaningful only) */
+  --color-status-open: #71717a;
+  --color-status-progress: #d97706;
+  --color-status-resolved: #16a34a;
+  --color-status-closed: #a1a1aa;
+  --color-priority-low: #a1a1aa;
+  --color-priority-medium: #d97706;
+  --color-priority-high: #dc2626;
+  --color-priority-urgent: #b91c1c;
+
+  /* Radii — inputs 6, default 8, cards/modals 12 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Motion — soft ease-out, 300ms hard cap */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smoke: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 160ms;
+  --duration-base: 220ms;
+  --duration-slow: 280ms;
+  --duration-collapse: 280ms;
+}
+
+/* Dark mode — same restraint, inverted neutrals */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #09090b;
+    --color-foreground: #fafafa;
+    --color-card: #131316;
+    --color-card-foreground: #fafafa;
+    --color-muted: #1c1c1f;
+    --color-muted-foreground: #a1a1aa;
+    --color-primary: #6366f1;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #1c1c1f;
+    --color-secondary-foreground: #fafafa;
+    --color-accent: #1c1c1f;
+    --color-accent-foreground: #fafafa;
+    --color-destructive: #f87171;
+    --color-border: #27272a;
+    --color-input: #27272a;
+    --color-ring: #6366f1;
+    --color-status-open: #a1a1aa;
+    --color-status-progress: #fbbf24;
+    --color-status-resolved: #4ade80;
+    --color-status-closed: #52525b;
+    --color-priority-low: #52525b;
+    --color-priority-medium: #fbbf24;
+    --color-priority-high: #f87171;
+    --color-priority-urgent: #ef4444;
+  }
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  /* Focus rings — 2px accent, 2px offset, never removed */
+  *:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Numbers / code use mono for a confident, tabular feel */
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Plain global classes (NOT in @layer utilities) so Tailwind v4 never purges them. */
+
+.transition-base {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-out-soft);
+}
+.transition-fast {
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out-soft);
+}
+.transition-slow {
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-out-soft);
+}
+/* Collapse-aware width transition for the sidebar */
+.transition-collapse {
+  transition-property: width, padding, opacity, transform;
+  transition-duration: var(--duration-collapse);
+  transition-timing-function: var(--ease-out-soft);
+  will-change: width;
+}
+/* Smoke: gentle fade + rise + tiny blur for content/overlays */
+.animate-smoke-in {
+  animation: smoke-in var(--duration-slow) var(--ease-smoke) both;
+}
+.animate-overlay-in {
+  animation: overlay-in var(--duration-base) var(--ease-smoke) both;
+}
+.animate-panel-in {
+  animation: panel-in var(--duration-base) var(--ease-out-soft) both;
+}
+
+@keyframes smoke-in {
+  from { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Honor reduced motion — kill transitions/animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

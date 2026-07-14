@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
-import { pool } from '@/lib/db'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { db } from '@/lib/db'
 
 function requiredEnv(name: string) {
   const value = process.env[name]
@@ -35,7 +36,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const auth = betterAuth({
-  database: pool,
+  database: drizzleAdapter(db, { provider: 'pg' }),
   baseURL: baseURL,
   emailAndPassword: {
     enabled: true,

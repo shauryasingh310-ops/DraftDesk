@@ -1,15 +1,42 @@
 import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
 
+function requiredEnv(name: string) {
+  const value = process.env[name]
+  if (!value || value.trim() === '') {
+    throw new Error(`[auth] Missing required env var: ${name}`)
+  }
+  return value
+}
+
+function resolveBaseURL() {
+  const direct = process.env.BETTER_AUTH_URL
+  if (direct && direct.trim()) return direct
+
+  const vercelProj = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  if (vercelProj && vercelProj.trim()) return `https://${vercelProj}`
+
+  const vercelUrl = process.env.VERCEL_URL
+  if (vercelUrl && vercelUrl.trim()) return `https://${vercelUrl}`
+
+  if (process.env.V0_RUNTIME_URL && process.env.V0_RUNTIME_URL.trim()) return process.env.V0_RUNTIME_URL
+
+  // allow undefined in dev if desired, but in prod we want an explicit error
+  return undefined
+}
+
+const baseURL = resolveBaseURL()
+if (process.env.NODE_ENV === 'production') {
+  requiredEnv('BETTER_AUTH_SECRET')
+  requiredEnv('DATABASE_URL')
+  if (!baseURL) {
+    throw new Error('[auth] Could not resolve BETTER_AUTH_URL/baseURL in production')
+  }
+}
+
 export const auth = betterAuth({
   database: pool,
-  baseURL:
-    process.env.BETTER_AUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.V0_RUNTIME_URL),
+  baseURL: baseURL,
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
@@ -21,6 +48,8 @@ export const auth = betterAuth({
     ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
       : []),
+    // Also allow the baseURL we resolved (helps when env vars differ)
+    ...(baseURL ? [baseURL] : []),
   ],
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
@@ -39,3 +68,4 @@ export const auth = betterAuth({
       }
     : {}),
 })
+

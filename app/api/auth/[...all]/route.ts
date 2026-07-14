@@ -3,6 +3,16 @@ import { toNextJsHandler } from 'better-auth/next-js'
 
 const handler = toNextJsHandler(auth.handler)
 
+function safeErrorMessage(e: unknown) {
+  if (e instanceof Error) return e.message
+  if (typeof e === 'string') return e
+  try {
+    return JSON.stringify(e)
+  } catch {
+    return String(e)
+  }
+}
+
 async function logError(req: Request, e: unknown) {
   console.error('[auth] request failed:', {
     url: req.url,
@@ -19,12 +29,8 @@ export const GET = async (req: Request) => {
     return await handler.GET(req)
   } catch (e) {
     await logError(req, e)
-    return new Response(
-      process.env.NODE_ENV === 'production'
-        ? 'Internal Server Error'
-        : JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
-      { status: 500 },
-    )
+    const message = safeErrorMessage(e)
+    return new Response(JSON.stringify({ error: message }), { status: 500 })
   }
 }
 
@@ -33,11 +39,8 @@ export const POST = async (req: Request) => {
     return await handler.POST(req)
   } catch (e) {
     await logError(req, e)
-    return new Response(
-      process.env.NODE_ENV === 'production'
-        ? 'Internal Server Error'
-        : JSON.stringify({ error: e instanceof Error ? e.message : String(e) }),
-      { status: 500 },
-    )
+    const message = safeErrorMessage(e)
+    return new Response(JSON.stringify({ error: message }), { status: 500 })
   }
 }
+
